@@ -60,46 +60,46 @@ export default function ShoulderRiskTool() {
   };
 
   const infoText = {
-    elbow: "Check if the elbow extends more than 10\u00b0 beyond straight.",
-    thumb: "Check if the thumb can touch the forearm.",
-    littleFinger: "Check if the little finger bends back beyond 90\u00b0.",
-    sublux: "Previous partial shoulder dislocation (subluxation).",
-    dislocation: "Previous full shoulder dislocation requiring reduction.",
-    operative: "If dislocated, was surgical treatment done?",
-    apprehension: "Positive apprehension test (pain/fear with ER).",
-    skydiveTest: "Instability or fear in simulated skydive posture."
+    elbow: "Does the elbow extend more than 10° past straight?",
+    thumb: "Can the thumb touch the forearm?",
+    littleFinger: "Can the pinky extend back beyond 90°?",
+    sublux: "History of a partial shoulder dislocation (subluxation)?",
+    dislocation: "Has there been a full shoulder dislocation needing reduction?",
+    operative: "Was the dislocation treated surgically?",
+    apprehension: "Fear or instability in external rotation (Apprehension Test)?",
+    skydiveTest: "Instability or fear in a simulated skydive posture?"
   };
 
   const renderSwitch = (label, state, setter, infoKey) => (
-    <div className="flex justify-between items-start border-b py-3">
+    <div className="flex justify-between items-start border-b py-4 hover:bg-blue-50 transition duration-200">
       <div className="text-sm w-4/5">
-        <p className="font-medium leading-tight">{label}</p>
-        <p className="text-xs text-gray-500 mt-1 italic">{infoText[infoKey]}</p>
+        <p className="font-semibold text-gray-800">{label}</p>
+        <p className="text-xs text-blue-500 mt-1 italic">{infoText[infoKey]}</p>
       </div>
       <input
         type="checkbox"
         checked={state}
         onChange={(e) => setter(e.target.checked)}
-        className="h-4 w-4 mt-1"
+        className="h-5 w-5 mt-1 accent-blue-600"
       />
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 p-6">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-blue-900 mb-6">
-          SkyLux: Shoulder Risk Scanner
+        <h1 className="text-4xl font-extrabold text-center text-indigo-800 mb-8 tracking-tight">
+          SkyLux Shoulder Risk Tool
         </h1>
 
-        <div className="bg-white rounded-xl shadow-xl p-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Age Group</label>
+              <label className="block text-sm font-bold text-gray-700">Age Group</label>
               <select
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
-                className="w-full mt-1 border border-gray-300 rounded-md p-2"
+                className="w-full mt-2 border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="<16">Under 16</option>
                 <option value="16-25">16–25</option>
@@ -110,11 +110,11 @@ export default function ShoulderRiskTool() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Sex</label>
+              <label className="block text-sm font-bold text-gray-700">Sex</label>
               <select
                 value={sex}
                 onChange={(e) => setSex(e.target.value)}
-                className="w-full mt-1 border border-gray-300 rounded-md p-2"
+                className="w-full mt-2 border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -136,28 +136,28 @@ export default function ShoulderRiskTool() {
           <div className="text-center">
             <button
               onClick={() => setShowResult(true)}
-              className="mt-4 bg-blue-700 text-white px-6 py-2 rounded hover:bg-blue-800"
+              className="mt-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-xl shadow-md hover:scale-105 transition-transform"
             >
-              Show Risk Score
+              Show My Risk Score
             </button>
           </div>
 
           {showResult && (
-            <div className="text-center space-y-3 pt-6">
-              <p className="text-lg font-semibold">
-                Risk Score: <span className="font-bold text-blue-700">{score} / 10</span>
+            <div className="text-center space-y-4 pt-6">
+              <p className="text-xl font-semibold text-indigo-700">
+                Your Risk Score: <span className="font-bold">{score} / 10</span>
               </p>
-              <div className="w-full h-6 rounded overflow-hidden bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 relative">
+              <div className="w-full h-6 rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 relative shadow-inner">
                 <div
                   style={{ width: `${(score / 10) * 100}%` }}
-                  className="h-full bg-black/30"
+                  className="h-full bg-black/30 rounded-full transition-all duration-300"
                 />
               </div>
 
               {process.env.NODE_ENV !== 'production' && (
                 <button
                   onClick={exportCSV}
-                  className="mt-4 bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+                  className="mt-4 bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-black"
                 >
                   Export Data as CSV
                 </button>
