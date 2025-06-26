@@ -11,6 +11,7 @@ export default function ShoulderRiskTool() {
   const [operative, setOperative] = useState(false);
   const [apprehension, setApprehension] = useState(false);
   const [skydiveTest, setSkydiveTest] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
   const getScore = () => {
     let score = 0;
@@ -32,18 +33,6 @@ export default function ShoulderRiskTool() {
   };
 
   const score = getScore();
-  const getColor = () => `hsl(${120 - (score * 12)}, 100%, 45%)`;
-
-  const infoText = {
-    elbow: "Check if the elbow extends more than 10\u00b0 beyond straight.",
-    thumb: "Check if the thumb can touch the forearm.",
-    littleFinger: "Check if the little finger bends back beyond 90\u00b0.",
-    sublux: "Previous partial shoulder dislocation (subluxation).",
-    dislocation: "Previous full shoulder dislocation requiring reduction.",
-    operative: "If dislocated, was surgical treatment done?",
-    apprehension: "Positive apprehension test (pain/fear with ER).",
-    skydiveTest: "Instability or fear in simulated skydive posture."
-  };
 
   const exportCSV = () => {
     const data = {
@@ -70,81 +59,112 @@ export default function ShoulderRiskTool() {
     document.body.removeChild(link);
   };
 
+  const infoText = {
+    elbow: "Check if the elbow extends more than 10\u00b0 beyond straight.",
+    thumb: "Check if the thumb can touch the forearm.",
+    littleFinger: "Check if the little finger bends back beyond 90\u00b0.",
+    sublux: "Previous partial shoulder dislocation (subluxation).",
+    dislocation: "Previous full shoulder dislocation requiring reduction.",
+    operative: "If dislocated, was surgical treatment done?",
+    apprehension: "Positive apprehension test (pain/fear with ER).",
+    skydiveTest: "Instability or fear in simulated skydive posture."
+  };
+
   const renderSwitch = (label, state, setter, infoKey) => (
-    <div className="flex items-center justify-between border-b py-2">
-      <div className="text-sm">
-        <label className="font-medium">{label}</label>
-        <span className="ml-2 text-gray-500 text-xs">({infoText[infoKey]})</span>
+    <div className="flex justify-between items-start border-b py-3">
+      <div className="text-sm w-4/5">
+        <p className="font-medium leading-tight">{label}</p>
+        <p className="text-xs text-gray-500 mt-1 italic">{infoText[infoKey]}</p>
       </div>
       <input
         type="checkbox"
         checked={state}
         onChange={(e) => setter(e.target.checked)}
-        className="h-4 w-4"
+        className="h-4 w-4 mt-1"
       />
     </div>
   );
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
-      <h1 className="text-2xl font-bold text-center">SkyLux: Shoulder Risk Scanner</h1>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50 p-6">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-3xl font-bold text-center text-blue-900 mb-6">
+          SkyLux: Shoulder Risk Scanner
+        </h1>
 
-      <div className="bg-white shadow p-4 rounded space-y-4">
-        <div>
-          <label className="block text-sm font-medium">Age Group</label>
-          <select
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            className="w-full border rounded p-2 mt-1"
-          >
-            <option value="<16">Under 16</option>
-            <option value="16-25">16–25</option>
-            <option value="25-30">25–30</option>
-            <option value="30-35">30–35</option>
-            <option value=">35">Over 35</option>
-          </select>
+        <div className="bg-white rounded-xl shadow-xl p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Age Group</label>
+              <select
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                className="w-full mt-1 border border-gray-300 rounded-md p-2"
+              >
+                <option value="<16">Under 16</option>
+                <option value="16-25">16–25</option>
+                <option value="25-30">25–30</option>
+                <option value="30-35">30–35</option>
+                <option value=">35">Over 35</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Sex</label>
+              <select
+                value={sex}
+                onChange={(e) => setSex(e.target.value)}
+                className="w-full mt-1 border border-gray-300 rounded-md p-2"
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="divide-y divide-gray-200">
+            {renderSwitch("Elbow Hyperextension >10°", elbow, setElbow, "elbow")}
+            {renderSwitch("Thumb to Forearm", thumb, setThumb, "thumb")}
+            {renderSwitch("Little Finger >90°", littleFinger, setLittleFinger, "littleFinger")}
+            {renderSwitch("Previous Subluxation", sublux, setSublux, "sublux")}
+            {renderSwitch("Previous Dislocation", dislocation, setDislocation, "dislocation")}
+            {renderSwitch("Operative Treatment (if dislocation)", operative, setOperative, "operative")}
+            {renderSwitch("Positive Apprehension Test", apprehension, setApprehension, "apprehension")}
+            {renderSwitch("Positive Functional Skydive Test", skydiveTest, setSkydiveTest, "skydiveTest")}
+          </div>
+
+          <div className="text-center">
+            <button
+              onClick={() => setShowResult(true)}
+              className="mt-4 bg-blue-700 text-white px-6 py-2 rounded hover:bg-blue-800"
+            >
+              Show Risk Score
+            </button>
+          </div>
+
+          {showResult && (
+            <div className="text-center space-y-3 pt-6">
+              <p className="text-lg font-semibold">
+                Risk Score: <span className="font-bold text-blue-700">{score} / 10</span>
+              </p>
+              <div className="w-full h-6 rounded overflow-hidden bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 relative">
+                <div
+                  style={{ width: `${(score / 10) * 100}%` }}
+                  className="h-full bg-black/30"
+                />
+              </div>
+
+              {process.env.NODE_ENV !== 'production' && (
+                <button
+                  onClick={exportCSV}
+                  className="mt-4 bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+                >
+                  Export Data as CSV
+                </button>
+              )}
+            </div>
+          )}
         </div>
-
-        <div>
-          <label className="block text-sm font-medium">Sex</label>
-          <select
-            value={sex}
-            onChange={(e) => setSex(e.target.value)}
-            className="w-full border rounded p-2 mt-1"
-          >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
-
-        {renderSwitch("Elbow Hyperextension >10°", elbow, setElbow, "elbow")}
-        {renderSwitch("Thumb to Forearm", thumb, setThumb, "thumb")}
-        {renderSwitch("Little Finger >90°", littleFinger, setLittleFinger, "littleFinger")}
-        {renderSwitch("Previous Subluxation", sublux, setSublux, "sublux")}
-        {renderSwitch("Previous Dislocation", dislocation, setDislocation, "dislocation")}
-        {renderSwitch("Operative Treatment (if dislocation)", operative, setOperative, "operative")}
-        {renderSwitch("Positive Apprehension Test", apprehension, setApprehension, "apprehension")}
-        {renderSwitch("Positive Functional Skydive Test", skydiveTest, setSkydiveTest, "skydiveTest")}
-      </div>
-
-      <div className="text-center space-y-2">
-        <p className="text-lg font-medium">
-          Risk Score: <span className="font-bold">{score} / 10</span>
-        </p>
-        <div className="w-full h-6 bg-gray-200 rounded overflow-hidden">
-          <div
-            style={{ width: `${(score / 10) * 100}%`, backgroundColor: getColor() }}
-            className="h-full"
-          />
-        </div>
-        {process.env.NODE_ENV !== 'production' && (
-          <button
-            onClick={exportCSV}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Export Data as CSV
-          </button>
-        )}
       </div>
     </div>
   );
