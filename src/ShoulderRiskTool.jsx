@@ -23,6 +23,11 @@ export default function ShoulderRiskTool() {
 
   const sessionId = useRef(crypto.randomUUID());
 
+  useEffect(() => {
+    const timer = setTimeout(() => setSplash(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const baseTranslation = {
     title: "SkyLux: Shoulder Risk Scanner",
     showScore: "Show My Risk Score",
@@ -42,16 +47,18 @@ export default function ShoulderRiskTool() {
     finalYes: "Great – have fun flying!",
     finalNo: "Smart choice – enjoy a drink and relax!",
     summaryTitle: "Assessment Summary",
-    summaryNote: "Please show this screen to your instructor."
+    summaryNote: "Please show this screen to your instructor.",
+    enterBooking: "Enter your booking number to continue",
+    start: "Start"
   };
 
   const translations = {
     en: baseTranslation,
-    de: { ...baseTranslation, sex: "Biologisches Geschlecht" },
-    fr: { ...baseTranslation, sex: "Sexe biologique" },
-    it: { ...baseTranslation, sex: "Sesso biologico" },
-    nl: { ...baseTranslation, sex: "Biologisch geslacht" },
-    es: { ...baseTranslation, sex: "Sexo biológico" }
+    de: { ...baseTranslation, sex: "Biologisches Geschlecht", enterBooking: "Buchungsnummer eingeben, um fortzufahren", start: "Starten" },
+    fr: { ...baseTranslation, sex: "Sexe biologique", enterBooking: "Entrez votre numéro de réservation pour continuer", start: "Commencer" },
+    it: { ...baseTranslation, sex: "Sesso biologico", enterBooking: "Inserisci il numero di prenotazione per continuare", start: "Inizia" },
+    nl: { ...baseTranslation, sex: "Biologisch geslacht", enterBooking: "Voer je boekingsnummer in om door te gaan", start: "Start" },
+    es: { ...baseTranslation, sex: "Sexo biológico", enterBooking: "Ingrese su número de reserva para continuar", start: "Comenzar" }
   };
 
   const t = translations[lang] || translations.en;
@@ -96,6 +103,28 @@ export default function ShoulderRiskTool() {
     </div>
   );
 
+  if (splash) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-200 to-purple-200">
+        <h1 className="text-3xl font-bold mb-4">{t.title}</h1>
+        <p className="mb-4">{t.enterBooking}</p>
+        <input
+          value={bookingCode}
+          onChange={(e) => setBookingCode(e.target.value)}
+          className="border rounded px-4 py-2 mb-4"
+          placeholder="#12345"
+        />
+        <button
+          onClick={() => setSplash(false)}
+          disabled={!bookingCode}
+          className="bg-indigo-600 text-white px-6 py-2 rounded disabled:opacity-50"
+        >
+          {t.start}
+        </button>
+      </div>
+    );
+  }
+
   if (confirmed !== null) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 p-6 dark:bg-gray-900">
@@ -107,7 +136,7 @@ export default function ShoulderRiskTool() {
             <li><strong>{t.sex}:</strong> {sex}</li>
             <li><strong>Elbow Hyperextension:</strong> {elbow ? "Yes" : "No"}</li>
             <li><strong>Thumb to Forearm:</strong> {thumb ? "Yes" : "No"}</li>
-            <li><strong>Little Finger {'>'}90°:</strong> {littleFinger ? "Yes" : "No"}</li>
+            <li><strong>Little Finger >90°:</strong> {littleFinger ? "Yes" : "No"}</li>
             <li><strong>Previous Subluxation:</strong> {sublux ? "Yes" : "No"}</li>
             <li><strong>Previous Dislocation:</strong> {dislocation ? "Yes" : "No"}</li>
             <li><strong>Operative Treatment:</strong> {operative ? "Yes" : "No"}</li>
