@@ -1,5 +1,5 @@
-// Updated full app: multilingual, dark mode, splash, risk scoring, summary output
-import React, { useState, useEffect, useRef } from "react";
+// Full SkyLux Tool - Multilingual, Dark Mode, Booking Splash, Summary Page
+import React, { useState, useRef } from "react";
 
 export default function ShoulderRiskTool() {
   const [age, setAge] = useState("16-25");
@@ -14,19 +14,11 @@ export default function ShoulderRiskTool() {
   const [skydiveTest, setSkydiveTest] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [confirmed, setConfirmed] = useState(null);
-  const [theme, setTheme] = useState("light");
   const [lang, setLang] = useState("en");
   const [splash, setSplash] = useState(true);
   const [bookingCode, setBookingCode] = useState("");
-  const [codeEntered, setCodeEntered] = useState(false);
-  const [consent, setConsent] = useState(false);
 
   const sessionId = useRef(crypto.randomUUID());
-
-  useEffect(() => {
-    const timer = setTimeout(() => setSplash(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const baseTranslation = {
     title: "SkyLux: Shoulder Risk Scanner",
@@ -40,7 +32,6 @@ export default function ShoulderRiskTool() {
     yes: "Yes, I want to fly",
     no: "No, I prefer not to",
     saved: "✔ Response saved.",
-    consentLabel: "I consent to anonymized data use for safety and research purposes.",
     resultLow: "Your risk of shoulder injury is very low.",
     resultModerate: "Your risk of shoulder injury is moderate.",
     resultHigh: "Your risk of shoulder injury is high.",
@@ -63,12 +54,6 @@ export default function ShoulderRiskTool() {
 
   const t = translations[lang] || translations.en;
 
-  const getRiskInterpretation = (score) => {
-    if (score < 3) return t.resultLow;
-    if (score < 6) return t.resultModerate;
-    return t.resultHigh;
-  };
-
   const getScore = () => {
     let score = 0;
     if (age === "16-25") score += 3;
@@ -88,11 +73,16 @@ export default function ShoulderRiskTool() {
 
   const score = getScore();
 
-  const renderSwitch = (label, state, setter, infoText) => (
-    <div className="flex justify-between items-start border-b py-4 hover:bg-blue-50 transition duration-200">
-      <div className="text-sm w-4/5">
-        <p className="font-semibold text-gray-800 dark:text-gray-200">{label}</p>
-        <p className="text-xs text-blue-500 mt-1 italic">{infoText}</p>
+  const getRiskInterpretation = (score) => {
+    if (score < 3) return t.resultLow;
+    if (score < 6) return t.resultModerate;
+    return t.resultHigh;
+  };
+
+  const renderSwitch = (label, state, setter) => (
+    <div className="flex justify-between items-start border-b py-4">
+      <div className="text-sm">
+        <p className="font-semibold text-gray-800 dark:text-white">{label}</p>
       </div>
       <input
         type="checkbox"
@@ -103,17 +93,32 @@ export default function ShoulderRiskTool() {
     </div>
   );
 
-  if (splash) {
+  if (splash && !bookingCode) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-200 to-purple-200">
-        <h1 className="text-3xl font-bold mb-4">{t.title}</h1>
-        <p className="mb-4">{t.enterBooking}</p>
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 via-white to-purple-100 dark:from-gray-800 dark:to-gray-900">
+        <h1 className="text-3xl font-bold mb-4 text-indigo-800 dark:text-white">{t.title}</h1>
+        <p className="mb-4 text-gray-700 dark:text-gray-300">{t.enterBooking}</p>
         <input
           value={bookingCode}
           onChange={(e) => setBookingCode(e.target.value)}
-          className="border rounded px-4 py-2 mb-4"
+          className="border border-gray-400 rounded px-4 py-2 mb-4"
           placeholder="#12345"
         />
+        <div className="mb-4">
+          <label className="mr-2 text-sm text-gray-600">{t.language}</label>
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value)}
+            className="p-1 rounded border"
+          >
+            <option value="en">English</option>
+            <option value="de">Deutsch</option>
+            <option value="fr">Français</option>
+            <option value="it">Italiano</option>
+            <option value="nl">Nederlands</option>
+            <option value="es">Español</option>
+          </select>
+        </div>
         <button
           onClick={() => setSplash(false)}
           disabled={!bookingCode}
@@ -127,116 +132,100 @@ export default function ShoulderRiskTool() {
 
   if (confirmed !== null) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 p-6 dark:bg-gray-900">
-        <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-xl">
-          <h1 className="text-3xl font-bold text-center text-indigo-700 dark:text-indigo-300 mb-6">{t.summaryTitle}</h1>
-          <p className="text-center text-sm text-gray-600 dark:text-gray-300 mb-6">{t.summaryNote}</p>
-          <ul className="text-sm text-gray-700 dark:text-gray-200 space-y-1 mb-4">
-            <li><strong>{t.age}:</strong> {age}</li>
-            <li><strong>{t.sex}:</strong> {sex}</li>
-            <li><strong>Elbow Hyperextension:</strong> {elbow ? "Yes" : "No"}</li>
-            <li><strong>Thumb to Forearm:</strong> {thumb ? "Yes" : "No"}</li>
-            <li><strong>Little Finger >90°:</strong> {littleFinger ? "Yes" : "No"}</li>
-            <li><strong>Previous Subluxation:</strong> {sublux ? "Yes" : "No"}</li>
-            <li><strong>Previous Dislocation:</strong> {dislocation ? "Yes" : "No"}</li>
-            <li><strong>Operative Treatment:</strong> {operative ? "Yes" : "No"}</li>
-            <li><strong>Apprehension Test:</strong> {apprehension ? "Yes" : "No"}</li>
-            <li><strong>Skydive Test:</strong> {skydiveTest ? "Yes" : "No"}</li>
-            <li><strong>{t.riskScore}:</strong> {score} / 10</li>
-            <li><strong>Interpretation:</strong> {getRiskInterpretation(score)}</li>
-          </ul>
-          <p className="text-center text-xl font-bold text-indigo-800 dark:text-indigo-300 mt-6">
-            {confirmed ? t.finalYes : t.finalNo}
-          </p>
-        </div>
+      <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white p-6">
+        <h2 className="text-2xl font-bold mb-4">{t.summaryTitle}</h2>
+        <p>{t.riskScore}: <strong>{score} / 10</strong></p>
+        <p className="my-2 italic">{getRiskInterpretation(score)}</p>
+        <ul className="my-4 list-disc list-inside text-sm">
+          <li>{t.age}: {age}</li>
+          <li>{t.sex}: {sex}</li>
+          <li>Elbow Hyperextension: {elbow ? "Yes" : "No"}</li>
+          <li>Thumb to Forearm: {thumb ? "Yes" : "No"}</li>
+          <li>Little Finger >90°: {littleFinger ? "Yes" : "No"}</li>
+          <li>Previous Subluxation: {sublux ? "Yes" : "No"}</li>
+          <li>Previous Dislocation: {dislocation ? "Yes" : "No"}</li>
+          <li>Operative Treatment: {operative ? "Yes" : "No"}</li>
+          <li>Apprehension Test: {apprehension ? "Yes" : "No"}</li>
+          <li>Skydive Test: {skydiveTest ? "Yes" : "No"}</li>
+        </ul>
+        <p className="text-center font-semibold mt-6">{confirmed ? t.finalYes : t.finalNo}</p>
+        <p className="text-xs mt-2 text-gray-500">{t.summaryNote}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 p-6 dark:bg-gray-900 text-gray-900 dark:text-white">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white p-6">
       <div className="max-w-3xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-4xl font-extrabold text-indigo-800 dark:text-indigo-300">{t.title}</h1>
-          <select
-            value={lang}
-            onChange={(e) => setLang(e.target.value)}
-            className="bg-white text-black border rounded p-2 text-sm"
-          >
-            {Object.keys(translations).map((key) => (
-              <option key={key} value={key}>{key.toUpperCase()}</option>
-            ))}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">{t.title}</h1>
+          <select value={lang} onChange={(e) => setLang(e.target.value)} className="p-1 rounded border">
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="fr">FR</option>
+            <option value="it">IT</option>
+            <option value="nl">NL</option>
+            <option value="es">ES</option>
           </select>
         </div>
 
-        {!showResult && (
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-bold mb-1">{t.age}</label>
-                <select value={age} onChange={(e) => setAge(e.target.value)} className="w-full border rounded-xl p-3">
-                  <option value="<16">Under 16</option>
-                  <option value="16-25">16–25</option>
-                  <option value="25-30">25–30</option>
-                  <option value="30-35">30–35</option>
-                  <option value=">35">Over 35</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-bold mb-1">{t.sex}</label>
-                <select value={sex} onChange={(e) => setSex(e.target.value)} className="w-full border rounded-xl p-3">
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold mb-1">{t.age}</label>
+              <select value={age} onChange={(e) => setAge(e.target.value)} className="w-full border p-2 rounded">
+                <option value="<16">Under 16</option>
+                <option value="16-25">16–25</option>
+                <option value="25-30">25–30</option>
+                <option value="30-35">30–35</option>
+                <option value=">35">Over 35</option>
+              </select>
             </div>
-
-            <div className="divide-y divide-gray-200 dark:divide-gray-600">
-              {renderSwitch("Elbow Hyperextension >10°", elbow, setElbow, "Check if elbow extends beyond 10°.")}
-              {renderSwitch("Thumb to Forearm", thumb, setThumb, "Thumb touches forearm?")}
-              {renderSwitch("Little Finger >90°", littleFinger, setLittleFinger, "Pinky bends back beyond 90°?")}
-              {renderSwitch("Previous Subluxation", sublux, setSublux, "Any past partial dislocations?")}
-              {renderSwitch("Previous Dislocation", dislocation, setDislocation, "Full dislocation in the past?")}
-              {renderSwitch("Operative Treatment", operative, setOperative, "Surgical treatment after dislocation?")}
-              {renderSwitch("Apprehension Test", apprehension, setApprehension, "Fear or instability in ER?")}
-              {renderSwitch("Skydive Test", skydiveTest, setSkydiveTest, "Instability in flight posture?")}
+            <div>
+              <label className="block text-sm font-bold mb-1">{t.sex}</label>
+              <select value={sex} onChange={(e) => setSex(e.target.value)} className="w-full border p-2 rounded">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
             </div>
+          </div>
 
-            <div className="flex items-center gap-2">
-              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-              <span className="text-xs text-gray-600 dark:text-gray-300">{t.consentLabel}</span>
-            </div>
+          {renderSwitch("Elbow Hyperextension >10°", elbow, setElbow)}
+          {renderSwitch("Thumb to Forearm", thumb, setThumb)}
+          {renderSwitch("Little Finger >90°", littleFinger, setLittleFinger)}
+          {renderSwitch("Previous Subluxation", sublux, setSublux)}
+          {renderSwitch("Previous Dislocation", dislocation, setDislocation)}
+          {renderSwitch("Operative Treatment (if dislocation)", operative, setOperative)}
+          {renderSwitch("Positive Apprehension Test", apprehension, setApprehension)}
+          {renderSwitch("Positive Functional Skydive Test", skydiveTest, setSkydiveTest)}
 
+          {!showResult && (
             <button
               onClick={() => setShowResult(true)}
-              disabled={!consent}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl disabled:opacity-50"
+              className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
             >
               {t.showScore}
             </button>
-          </div>
-        )}
+          )}
 
-        {showResult && (
-          <div className="mt-8 space-y-6">
-            <p className="text-xl font-semibold text-center">{t.riskScore}: <span className="font-bold">{score} / 10</span></p>
-            <p className="text-center text-sm italic">{getRiskInterpretation(score)}</p>
-            <div className="w-full h-6 rounded-full bg-gradient-to-r from-green-400 via-yellow-300 to-red-500 relative">
-              <div
-                style={{ width: `${(score / 10) * 100}%` }}
-                className="h-full bg-black/30 rounded-full transition-all duration-300"
-              />
-            </div>
-
-            <div className="text-center">
-              <p className="text-lg font-medium mt-6 mb-2">{t.confirm}</p>
-              <div className="flex justify-center gap-4">
-                <button onClick={() => setConfirmed(true)} className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700">{t.yes}</button>
-                <button onClick={() => setConfirmed(false)} className="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700">{t.no}</button>
+          {showResult && (
+            <div className="mt-6">
+              <p className="text-lg font-medium">{t.riskScore}: <strong>{score} / 10</strong></p>
+              <p className="text-sm italic my-2">{getRiskInterpretation(score)}</p>
+              <div className="w-full h-6 rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 relative">
+                <div style={{ width: `${(score / 10) * 100}%` }} className="h-full bg-black/30 rounded-full transition-all" />
+              </div>
+              <div className="flex justify-center gap-4 mt-6">
+                <button onClick={() => setConfirmed(true)} className="bg-green-600 text-white px-4 py-2 rounded">
+                  {t.yes}
+                </button>
+                <button onClick={() => setConfirmed(false)} className="bg-red-600 text-white px-4 py-2 rounded">
+                  {t.no}
+                </button>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
