@@ -318,4 +318,4 @@ export default function ShoulderRiskTool() {
           <p className="text-lg font-semibold">{t.riskScore}: <span className="font-bold">{score} / 10</span></p>
           <div className="w-full h-5 bg-gray-300 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-green
+              className="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-500"
