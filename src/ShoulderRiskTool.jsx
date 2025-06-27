@@ -243,79 +243,93 @@ export default function ShoulderRiskTool() {
     { key: "apprehension", info: "apprehensionInfo", value: apprehension, setter: setApprehension },
     { key: "skydiveTest", info: "skydiveTestInfo", value: skydiveTest, setter: setSkydiveTest }
   ];
-
-  return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-4 max-w-3xl mx-auto flex flex-col">
-      <h1 className="text-2xl font-bold text-center mb-4">{t.title}</h1>
-      <div className="flex justify-end mb-2">
-        <label className="mr-2 text-sm">{t.language}</label>
+return (
+  <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-4 max-w-3xl mx-auto flex flex-col">
+    <h1 className="text-2xl font-bold text-center mb-4">{t.title}</h1>
+    <div className="flex justify-end mb-2">
+      <label className="mr-2 text-sm">{t.language}</label>
+      <select
+        value={lang}
+        onChange={e => setLang(e.target.value)}
+        className="p-1 rounded border bg-white text-gray-900"
+      >
+        <option value="en">English</option>
+        <option value="de">Deutsch</option>
+        <option value="fr">Français</option>
+      </select>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label className="block text-sm font-bold mb-1">{t.age}</label>
         <select
-          value={lang}
-          onChange={e => setLang(e.target.value)}
-          className="p-1 rounded border bg-white text-gray-900"
+          value={age}
+          onChange={e => setAge(e.target.value)}
+          className="w-full border rounded-xl p-2 bg-white text-gray-900"
+          disabled={showResult}
         >
-          <option value="en">English</option>
-          <option value="de">Deutsch</option>
-          <option value="fr">Français</option>
+          <option value="<16">&lt;16</option>
+          <option value="16-25">16–25</option>
+          <option value="25-30">25–30</option>
+          <option value="30-35">30–35</option>
+          <option value=">35">&gt;35</option>
         </select>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label className="block text-sm font-bold mb-1">{t.age}</label>
-          <select
-            value={age}
-            onChange={e => setAge(e.target.value)}
-            className="w-full border rounded-xl p-2 bg-white text-gray-900"
-            disabled={showResult}
-          >
-            <option value="<16">&lt;16</option>
-            <option value="16-25">16–25</option>
-            <option value="25-30">25–30</option>
-            <option value="30-35">30–35</option>
-            <option value=">35">&gt;35</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-bold mb-1">{t.sex}</label>
-          <select
-            value={sex}
-            onChange={e => setSex(e.target.value)}
-            className="w-full border rounded-xl p-2 bg-white text-gray-900"
-            disabled={showResult}
-          >
-            <option value="male">{t.sexMale}</option>
-            <option value="female">{t.sexFemale}</option>
-          </select>
-        </div>
-      </div>
       <div>
-        {questions.map(q => (
-          <div key={q.key} className="flex flex-col md:flex-row justify-between items-start md:items-center border-b py-3">
-            <div className="text-sm w-full md:w-4/5">
-              <span className="font-semibold">{t[q.key]}</span>
-              <span className="block text-xs text-blue-600 dark:text-blue-300 mt-1 italic">{t[q.info]}</span>
-            </div>
-            <input
-              type="checkbox"
-              checked={typeof q.value === "function" ? q.value() : q.value}
-              onChange={e => q.setter(e.target.checked)}
-              className="h-5 w-5 accent-indigo-600 mt-2 md:mt-0"
-              disabled={showResult}
-              aria-label={t[q.key]}
-            />
-          </div>
-        ))}
-      </div>
-      {!showResult ? (
-        <button
-          onClick={() => setShowResult(true)}
-          className="mt-6 bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700"
+        <label className="block text-sm font-bold mb-1">{t.sex}</label>
+        <select
+          value={sex}
+          onChange={e => setSex(e.target.value)}
+          className="w-full border rounded-xl p-2 bg-white text-gray-900"
+          disabled={showResult}
         >
-          {t.showScore}
+          <option value="male">{t.sexMale}</option>
+          <option value="female">{t.sexFemale}</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      {questions.map(q => (
+        <div key={q.key} className="flex flex-col md:flex-row justify-between items-start md:items-center border-b py-3">
+          <div className="text-sm w-full md:w-4/5">
+            <span className="font-semibold">{t[q.key]}</span>
+            <span className="block text-xs text-blue-600 dark:text-blue-300 mt-1 italic">{t[q.info]}</span>
+          </div>
+          <input
+            type="checkbox"
+            checked={typeof q.value === "function" ? q.value() : q.value}
+            onChange={e => q.setter(e.target.checked)}
+            className="h-5 w-5 accent-indigo-600 mt-2 md:mt-0"
+            disabled={showResult}
+            aria-label={t[q.key]}
+          />
+        </div>
+      ))}
+    </div>
+    {!showResult ? (
+      <button
+        onClick={() => setShowResult(true)}
+        className="mt-6 bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700"
+      >
+        {t.showScore}
+      </button>
+    ) : (
+      <div className="mt-6 space-y-4 text-center">
+        <p className="text-lg font-semibold">
+          {t.riskScore}: <span className="font-bold">{score} / 10</span>
+        </p>
+        <div className="w-full h-5 bg-gray-300 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-500"
+            style={{ width: `${(score / 10) * 100}%`, transition: 'width 0.5s' }}
+          ></div>
+        </div>
+        <button
+          onClick={() => setShowResult(false)}
+          className="mt-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600"
+        >
+          {t.editAnswers}
         </button>
-      ) : (
-        <div className="mt-6 space-y-4 text-center">
-          <p className="text-lg font-semibold">{t.riskScore}: <span className="font-bold">{score} / 10</span></p>
-          <div className="w-full h-5 bg-gray-300 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-500"
+      </div>
+    )}
+  </div>
+);
